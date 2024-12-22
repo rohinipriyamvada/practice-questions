@@ -117,6 +117,36 @@ const joinedArraysOf = function (arrayOfArrays) {
   })
 };
 
+//---------------------------------------------------------------------------//
+// repeat strings in ["hi", "bye"] => ["hihi", "byebye"]
+
+const repeatedStringsOf = function (strings) {
+  return strings.map((string) => string.repeat(2));
+};
+
+//---------------------------------------------------------------------------//
+// count vowels in ["apple", "banana", "grape"] => [2, 3, 2]
+
+const isVowel = function (char) {
+  return "aeiou".includes(char);
+}
+
+const countVowels = function (string) {
+  return [...string].filter(isVowel).length;
+}
+
+const countVowelsOf = function (strings) {
+  return strings.map(countVowels);
+};
+
+//---------------------------------------------------------------------------//
+// reverse arrays of [[1, 2, 3], [4, 5, 6]] => [[3, 2, 1], [6, 5, 4]]
+
+const reversedArraysOf = function (arrays) {
+
+};
+
+//---------------------------------------------------------------------------//
 //---------------------------------Testing-----------------------------------//
 
 const isEmpty = function (array) {
@@ -256,6 +286,21 @@ const testCases12 = [
   [joinedArraysOf, [["h", "i"], ["y", "o", "u"]], ["hi", "you"]]
 ]
 
+const testCases13 = [
+  [repeatedStringsOf, ["hi"], ["hihi"]],
+  [repeatedStringsOf, ["hi", "there"], ["hihi", "therethere"]]
+]
+
+const testCases14 = [
+  [countVowelsOf, ["apple"], [2]],
+  [countVowelsOf, ["apple", "aeiou"], [2, 5]],
+  [countVowelsOf, ["apple", "aeiou", "quill"], [2, 5, 2]]
+]
+
+const testCases15 = [
+  [reversedArraysOf, [[1, 2, 3], [4, 5, 6]], [[3, 2, 1], [6, 5, 4]]]
+]
+
 // testAll(testCases1);
 // testAll(testCases2);
 // testAll(testCases3);
@@ -267,4 +312,7 @@ const testCases12 = [
 // testAll(testCases9);
 // testAll(testCases10);
 // testAll(testCases11);
-testAll(testCases12);
+// testAll(testCases12);
+// testAll(testCases13);
+// testAll(testCases14);
+testAll(testCases15);
