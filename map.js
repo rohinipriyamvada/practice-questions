@@ -105,7 +105,7 @@ const domainNamesOf = function (emails) {
 //[["hello", "world"], ["goodbye", "moon"]]
 
 const splitWordsOf = function (strings) {
-
+  return strings.map((words) => words.split(" "));
 };
 
 //---------------------------------Testing-----------------------------------//
@@ -186,7 +186,6 @@ const testCases1 = [
   [squaresOf, [50, 35, 25], [2500, 1225, 625]]
 ];
 
-
 const testCases2 = [
   [lengthsOf, ["apple", "banana", "kiwi"], [5, 6, 4]],
   [lengthsOf, ["apple", "", "kiwi"], [5, 0, 4]],
@@ -234,9 +233,14 @@ const testCases9 = [
 ]
 
 const testCases10 = [
-  [domainNamesOf, ["abc@gmail.com", "123@yahoo.com"], ["gmail.com", "yahoo.com"]]
+  [domainNamesOf, ["abc@gmail.com", "123@yahoo.com"],
+    ["gmail.com", "yahoo.com"]]
 ]
 
+const testCases11 = [
+  [splitWordsOf, ["hello world", "goodbye moon"],
+    [["hello", "world"], ["goodbye", "moon"]]]
+]
 // testAll(testCases1);
 // testAll(testCases2);
 // testAll(testCases3);
@@ -246,4 +250,5 @@ const testCases10 = [
 // testAll(testCases7);
 // testAll(testCases8);
 // testAll(testCases9);
-testAll(testCases10);
+// testAll(testCases10);
+testAll(testCases11);
