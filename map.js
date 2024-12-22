@@ -90,7 +90,12 @@ const charCodesOf = function (strings) {
 // extract domain names from 
 //["user1@gmail.com", "admin@yahoo.com"] => ["gmail.com", "yahoo.com"]
 
-const domainNamesOf = function (emails) { };
+const domainNamesOf = function (emails) {
+  return emails.map(function (email) {
+    const domainStart = [...email].indexOf("@");
+    return email.slice(domainStart + 1);
+  })
+};
 
 //---------------------------------Testing-----------------------------------//
 
@@ -217,6 +222,10 @@ const testCases9 = [
   //returned
 ]
 
+const testCases10 = [
+  [domainNamesOf, ["abc@gmail.com", "123@yahoo.com"], ["gmail.com", "yahoo.com"]]
+]
+
 // testAll(testCases1);
 // testAll(testCases2);
 // testAll(testCases3);
@@ -225,4 +234,5 @@ const testCases9 = [
 // testAll(testCases6);
 // testAll(testCases7);
 // testAll(testCases8);
-testAll(testCases9);
+// testAll(testCases9);
+testAll(testCases10);
