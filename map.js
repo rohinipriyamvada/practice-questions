@@ -147,6 +147,47 @@ const reversedArraysOf = function (arrays) {
 };
 
 //---------------------------------------------------------------------------//
+// remove vowels from ["apple", "banana", "grape"] => ["ppl", "bnn", "grp"]
+
+const complement = function (value) {
+  return !value;
+}
+
+const isNotVowel = function (char) {
+  return complement(isVowel(char));
+}
+
+const removeVowels = function (string) {
+  return [...string].filter(isNotVowel).join("");
+}
+
+const withoutVowelsOf = function (strings) {
+  return strings.map(removeVowels);
+};
+
+//---------------------------------------------------------------------------//
+// cumulative sums of [[1, 2, 3], [4, 5, 6]] => [[1, 3, 6], [4, 9, 15]]
+// Example: cumulative sum of [1, 2, 3] is [1, 1+2, 1+2+3]
+
+const sumUp = function () {
+  let sum = 0;
+
+  return function (element, index) {
+    if (index === 0) {
+      sum = element;
+      return sum;
+    }
+
+    sum += element;
+    return sum;
+  }
+}
+
+const cumulativeSumsOf = function (arrays) {
+  return arrays.map(sumUp());
+};
+
+//---------------------------------------------------------------------------//
 //---------------------------------Testing-----------------------------------//
 
 const isEmpty = function (array) {
@@ -302,6 +343,15 @@ const testCases15 = [
   [reversedArraysOf, [[1, 2, 3], [4, 5, 6]], [[3, 2, 1], [6, 5, 4]]]
 ]
 
+const testCases16 = [
+  [withoutVowelsOf, ["apple"], ["ppl"]],
+  [withoutVowelsOf, ["apple", "kiwi"], ["ppl", "kw"]]
+]
+
+const testCases17 = [
+  [cumulativeSumsOf, [1, 2, 3], [1, 3, 6]]
+]
+
 // testAll(testCases1);
 // testAll(testCases2);
 // testAll(testCases3);
@@ -316,4 +366,6 @@ const testCases15 = [
 // testAll(testCases12);
 // testAll(testCases13);
 // testAll(testCases14);
-testAll(testCases15);
+// testAll(testCases15);
+// testAll(testCases16);
+testAll(testCases17);
