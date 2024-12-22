@@ -108,6 +108,15 @@ const splitWordsOf = function (strings) {
   return strings.map((words) => words.split(" "));
 };
 
+//---------------------------------------------------------------------------//
+// join arrays of [["a", "b"], ["c", "d"]] => ["ab", "cd"]
+
+const joinedArraysOf = function (arrayOfArrays) {
+  return arrayOfArrays.map(function (array) {
+    return array.join("");
+  })
+};
+
 //---------------------------------Testing-----------------------------------//
 
 const isEmpty = function (array) {
@@ -241,6 +250,12 @@ const testCases11 = [
   [splitWordsOf, ["hello world", "goodbye moon"],
     [["hello", "world"], ["goodbye", "moon"]]]
 ]
+
+const testCases12 = [
+  [joinedArraysOf, [["a", "b"], ["c", "d"]], ["ab", "cd"]],
+  [joinedArraysOf, [["h", "i"], ["y", "o", "u"]], ["hi", "you"]]
+]
+
 // testAll(testCases1);
 // testAll(testCases2);
 // testAll(testCases3);
@@ -251,4 +266,5 @@ const testCases11 = [
 // testAll(testCases8);
 // testAll(testCases9);
 // testAll(testCases10);
-testAll(testCases11);
+// testAll(testCases11);
+testAll(testCases12);
