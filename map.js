@@ -143,7 +143,7 @@ const countVowelsOf = function (strings) {
 // reverse arrays of [[1, 2, 3], [4, 5, 6]] => [[3, 2, 1], [6, 5, 4]]
 
 const reversedArraysOf = function (arrays) {
-
+  return arrays.map((array) => array.reverse());
 };
 
 //---------------------------------------------------------------------------//
@@ -298,6 +298,7 @@ const testCases14 = [
 ]
 
 const testCases15 = [
+  [reversedArraysOf, [[1, 2], [4]], [[2, 1], [4]]],
   [reversedArraysOf, [[1, 2, 3], [4, 5, 6]], [[3, 2, 1], [6, 5, 4]]]
 ]
 
