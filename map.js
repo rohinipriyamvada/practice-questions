@@ -10,9 +10,7 @@ const squaresOf = function (numbers) {
 // lengths of ["apple", "banana", "kiwi"] => [5, 6, 4]
 
 const lengthsOf = function (strings) {
-  return strings.map(function (string) {
-    return string.length;
-  });
+  return strings.map((string) => string.length);
 };
 
 //---------------------------------------------------------------------------//
@@ -217,6 +215,64 @@ const uniqueCharactersOf = function (strings) {
 };
 
 //---------------------------------------------------------------------------//
+// generate ranges from [3, 5, 2] => [[0, 1, 2], [0, 1, 2, 3, 4], [0, 1]]
+
+const generateRange = function (maxLimit) {
+  const range = [];
+
+  for (let i = 0; i < maxLimit; i++) {
+    range.push(i);
+  }
+
+  return range;
+}
+
+const rangesOf = function (numbers) {
+  return numbers.map(generateRange);
+};
+
+//---------------------------------------------------------------------------//
+// capitalize first letters of ["hello world", "goodbye moon"] =>
+//["Hello World", "Goodbye Moon"]
+
+const convertToUpper = function ([...chars]) {
+  chars[0] = chars[0].toUpperCase();
+
+  return chars.join("");
+}
+
+const convertFirstLetter = function (word) {
+  return word.split(" ").map(convertToUpper).join(" ");
+}
+
+const capitalizedFirstLettersOf = function (strings) {
+  return strings.map(convertFirstLetter);
+};
+
+//---------------------------------------------------------------------------//
+// find word lengths in ["apple pie", "banana split"] => [[5, 3], [6, 5]]
+
+const wordLengthsOf = function (strings) {
+  return strings.map(word => lengthsOf(word.split(" ")));
+};
+
+//---------------------------------------------------------------------------//
+// flatten nested arrays of [[1, [2, 3]], [4, [5, 6]]] => [[1, 2, 3], [4, 5, 6]]
+
+const flatArray = function (array) {
+  return array.flatMap(num => num);
+}
+
+const flattenedArraysOf = function (arrays) {
+  return arrays.map(flatArray);
+};
+
+//---------------------------------------------------------------------------//
+// sort letters in ["cat", "bat", "rat"] alphabetically => ["act", "abt", "art"]
+
+const sortedLettersOf = function (strings) { };
+
+//---------------------------------------------------------------------------//
 //---------------------------------------------------------------------------//
 //---------------------------------Testing-----------------------------------//
 
@@ -289,108 +345,125 @@ const testAll = function (testCasesArray) {
 
   return console.table(failed);
 }
+{
+  const testCases1 = [
+    [squaresOf, [1, 2, 3], [1, 4, 9]],
+    [squaresOf, [11, 12, 13], [121, 144, 169]],
+    [squaresOf, [50, 35, 25], [2500, 1225, 625]]
+  ];
 
-const testCases1 = [
-  [squaresOf, [1, 2, 3], [1, 4, 9]],
-  [squaresOf, [11, 12, 13], [121, 144, 169]],
-  [squaresOf, [50, 35, 25], [2500, 1225, 625]]
-];
+  const testCases2 = [
+    [lengthsOf, ["apple", "banana", "kiwi"], [5, 6, 4]],
+    [lengthsOf, ["apple", "", "kiwi"], [5, 0, 4]],
+    [lengthsOf, ["pine apple", "mango", "watermelon"], [10, 5, 10]]
+  ]
 
-const testCases2 = [
-  [lengthsOf, ["apple", "banana", "kiwi"], [5, 6, 4]],
-  [lengthsOf, ["apple", "", "kiwi"], [5, 0, 4]],
-  [lengthsOf, ["pine apple", "mango", "watermelon"], [10, 5, 10]]
-]
+  const testCases3 = [
+    [uppercaseOf, ["hello", "world"], ["HELLO", "WORLD"]],
+    [uppercaseOf, ["rohini", "priyamvada"], ["ROHINI", "PRIYAMVADA"]],
+    [uppercaseOf, ["step", "thoughtworks"], ["STEP", "THOUGHTWORKS"]]
+  ]
 
-const testCases3 = [
-  [uppercaseOf, ["hello", "world"], ["HELLO", "WORLD"]],
-  [uppercaseOf, ["rohini", "priyamvada"], ["ROHINI", "PRIYAMVADA"]],
-  [uppercaseOf, ["step", "thoughtworks"], ["STEP", "THOUGHTWORKS"]]
-]
+  const testCases4 = [
+    [firstCharactersOf, ["apple", "banana", "kiwi"], ["a", "b", "k"]],
+    [firstCharactersOf, ["wpple", "danana", "ziwi"], ["w", "d", "z"]],
+    [firstCharactersOf, ["lpple", "ranana", "ciwi"], ["l", "r", "c"]]
+  ]
 
-const testCases4 = [
-  [firstCharactersOf, ["apple", "banana", "kiwi"], ["a", "b", "k"]],
-  [firstCharactersOf, ["wpple", "danana", "ziwi"], ["w", "d", "z"]],
-  [firstCharactersOf, ["lpple", "ranana", "ciwi"], ["l", "r", "c"]]
-]
+  const testCases5 = [
+    [truthValuesOf, [0, 1, 2, 3], [false, true, true, true]],
+    [truthValuesOf, [-1, -3, 0, 1, 2, 3], [true, true, false, true, true, true]]
+  ]
 
-const testCases5 = [
-  [truthValuesOf, [0, 1, 2, 3], [false, true, true, true]],
-  [truthValuesOf, [-1, -3, 0, 1, 2, 3], [true, true, false, true, true, true]]
-]
+  const testCases6 = [
+    [reversedStringsOf, ["hello", "world"], ["olleh", "dlrow"]],
+    [reversedStringsOf, ["jumbo", "malayalam"], ["obmuj", "malayalam"]]
+  ]
 
-const testCases6 = [
-  [reversedStringsOf, ["hello", "world"], ["olleh", "dlrow"]],
-  [reversedStringsOf, ["jumbo", "malayalam"], ["obmuj", "malayalam"]]
-]
+  const testCases7 = [
+    [doubleLettersOf, ["cat"], ["ccaatt"]],
+    [doubleLettersOf, ["cat", "dog"], ["ccaatt", "ddoogg"]],
+    [doubleLettersOf, ["cat", "dog", "cow"], ["ccaatt", "ddoogg", "ccooww"]]
+  ]
 
-const testCases7 = [
-  [doubleLettersOf, ["cat"], ["ccaatt"]],
-  [doubleLettersOf, ["cat", "dog"], ["ccaatt", "ddoogg"]],
-  [doubleLettersOf, ["cat", "dog", "cow"], ["ccaatt", "ddoogg", "ccooww"]]
-]
+  const testCases8 = [
+    [negatedBooleansOf, [false, true, false], [true, false, true]],
+    [negatedBooleansOf, [false, false, true], [true, true, false]]
+  ]
 
-const testCases8 = [
-  [negatedBooleansOf, [false, true, false], [true, false, true]],
-  [negatedBooleansOf, [false, false, true], [true, true, false]]
-]
+  const testCases9 = [
+    [charCodesOf, ["a", "b", "c"], [97, 98, 99]],
+    [charCodesOf, ["1a", " b", "-c"], [49, 32, 45]]
+    //if two chars are given to find the unicode the unicode of first char is 
+    //returned
+  ]
 
-const testCases9 = [
-  [charCodesOf, ["a", "b", "c"], [97, 98, 99]],
-  [charCodesOf, ["1a", " b", "-c"], [49, 32, 45]]
-  //if two chars are given to find the unicode the unicode of first char is 
-  //returned
-]
+  const testCases10 = [
+    [domainNamesOf, ["abc@gmail.com", "123@yahoo.com"],
+      ["gmail.com", "yahoo.com"]]
+  ]
 
-const testCases10 = [
-  [domainNamesOf, ["abc@gmail.com", "123@yahoo.com"],
-    ["gmail.com", "yahoo.com"]]
-]
+  const testCases11 = [
+    [splitWordsOf, ["hello world", "goodbye moon"],
+      [["hello", "world"], ["goodbye", "moon"]]]
+  ]
 
-const testCases11 = [
-  [splitWordsOf, ["hello world", "goodbye moon"],
-    [["hello", "world"], ["goodbye", "moon"]]]
-]
+  const testCases12 = [
+    [joinedArraysOf, [["a", "b"], ["c", "d"]], ["ab", "cd"]],
+    [joinedArraysOf, [["h", "i"], ["y", "o", "u"]], ["hi", "you"]]
+  ]
 
-const testCases12 = [
-  [joinedArraysOf, [["a", "b"], ["c", "d"]], ["ab", "cd"]],
-  [joinedArraysOf, [["h", "i"], ["y", "o", "u"]], ["hi", "you"]]
-]
+  const testCases13 = [
+    [repeatedStringsOf, ["hi"], ["hihi"]],
+    [repeatedStringsOf, ["hi", "there"], ["hihi", "therethere"]]
+  ]
 
-const testCases13 = [
-  [repeatedStringsOf, ["hi"], ["hihi"]],
-  [repeatedStringsOf, ["hi", "there"], ["hihi", "therethere"]]
-]
+  const testCases14 = [
+    [countVowelsOf, ["apple"], [2]],
+    [countVowelsOf, ["apple", "aeiou"], [2, 5]],
+    [countVowelsOf, ["apple", "aeiou", "quill"], [2, 5, 2]]
+  ]
 
-const testCases14 = [
-  [countVowelsOf, ["apple"], [2]],
-  [countVowelsOf, ["apple", "aeiou"], [2, 5]],
-  [countVowelsOf, ["apple", "aeiou", "quill"], [2, 5, 2]]
-]
+  const testCases15 = [
+    [reversedArraysOf, [[1, 2], [4]], [[2, 1], [4]]],
+    [reversedArraysOf, [[1, 2, 3], [4, 5, 6]], [[3, 2, 1], [6, 5, 4]]]
+  ]
 
-const testCases15 = [
-  [reversedArraysOf, [[1, 2], [4]], [[2, 1], [4]]],
-  [reversedArraysOf, [[1, 2, 3], [4, 5, 6]], [[3, 2, 1], [6, 5, 4]]]
-]
+  const testCases16 = [
+    [withoutVowelsOf, ["apple"], ["ppl"]],
+    [withoutVowelsOf, ["apple", "kiwi"], ["ppl", "kw"]]
+  ]
 
-const testCases16 = [
-  [withoutVowelsOf, ["apple"], ["ppl"]],
-  [withoutVowelsOf, ["apple", "kiwi"], ["ppl", "kw"]]
-]
+  const testCases17 = [
+    [cumulativeSumsOf, [1, 2, 3], [1, 3, 6]]
+  ]
 
-const testCases17 = [
-  [cumulativeSumsOf, [1, 2, 3], [1, 3, 6]]
-]
+  const testCases18 = [
+    [reversedWordsOf, ["hello world"], ["olleh dlrow"]],
+    [reversedWordsOf, ["hello world", "bye sun"], ["olleh dlrow", "eyb nus"]]
+  ]
 
-const testCases18 = [
-  [reversedWordsOf, ["hello world"], ["olleh dlrow"]],
-  [reversedWordsOf, ["hello world", "bye sun"], ["olleh dlrow", "eyb nus"]]
-]
+  const testCases19 = [
+    [uniqueCharactersOf, ["apple"], ["aple"]],
+    [uniqueCharactersOf, ["apple", "banana"], ["aple", "ban"]],
+    [uniqueCharactersOf, ["apple", "banana", "grape"], ["aple", "ban", "grape"]]
+  ]
 
-const testCases19 = [
-  [uniqueCharactersOf, ["apple"], ["aple"]],
-  [uniqueCharactersOf, ["apple", "banana"], ["aple", "ban"]],
-  [uniqueCharactersOf, ["apple", "banana", "grape"], ["aple", "ban", "grape"]]
+  const testCases20 = [
+    [rangesOf, [3, 5, 2], [[0, 1, 2], [0, 1, 2, 3, 4], [0, 1]]]
+  ]
+
+  const testCases21 = [
+    [capitalizedFirstLettersOf, ["hello world", "goodbye moon"],
+      ["Hello World", "Goodbye Moon"]]
+  ]
+
+  const testCases22 = [
+    [wordLengthsOf, ["apple pie", "banana split"], [[5, 3], [6, 5]]],
+  ]
+}
+const testCases23 = [
+  [flattenedArraysOf, [[1, [2, 3]], [4, [5, 6]]], [[1, 2, 3], [4, 5, 6]]]
 ]
 
 // testAll(testCases1);
@@ -411,4 +484,8 @@ const testCases19 = [
 // testAll(testCases16);
 // testAll(testCases17);
 // testAll(testCases18);
-testAll(testCases19);
+// testAll(testCases19);
+// testAll(testCases20);
+// testAll(testCases21);
+// testAll(testCases22);
+testAll(testCases23);
