@@ -188,6 +188,36 @@ const cumulativeSumsOf = function (arrays) {
 };
 
 //---------------------------------------------------------------------------//
+// reverse words in ["hello world", "goodbye moon"] =>
+// ["olleh dlrow", "eybdoog noom"]
+
+const reversedWordsOf = function (strings) {
+  return strings.map((word) => reversedStringsOf(word.split(" ")).join(" "));
+};
+
+//---------------------------------------------------------------------------//
+// extract unique characters from ["apple", "banana", "grape"] => 
+//["aple", "ban", "grape"]
+// Maintain the order of their first appearance in each string
+
+const checkDuplicates = function (uniqueEleArray, char) {
+  if (!uniqueEleArray.includes(char)) {
+    uniqueEleArray.push(char);
+  }
+
+  return uniqueEleArray;
+}
+
+const removeDuplicates = function ([...chars]) {
+  return chars.reduce(checkDuplicates, []).join("");
+}
+
+const uniqueCharactersOf = function (strings) {
+  return strings.map(removeDuplicates);
+};
+
+//---------------------------------------------------------------------------//
+//---------------------------------------------------------------------------//
 //---------------------------------Testing-----------------------------------//
 
 const isEmpty = function (array) {
@@ -352,6 +382,17 @@ const testCases17 = [
   [cumulativeSumsOf, [1, 2, 3], [1, 3, 6]]
 ]
 
+const testCases18 = [
+  [reversedWordsOf, ["hello world"], ["olleh dlrow"]],
+  [reversedWordsOf, ["hello world", "bye sun"], ["olleh dlrow", "eyb nus"]]
+]
+
+const testCases19 = [
+  [uniqueCharactersOf, ["apple"], ["aple"]],
+  [uniqueCharactersOf, ["apple", "banana"], ["aple", "ban"]],
+  [uniqueCharactersOf, ["apple", "banana", "grape"], ["aple", "ban", "grape"]]
+]
+
 // testAll(testCases1);
 // testAll(testCases2);
 // testAll(testCases3);
@@ -368,4 +409,6 @@ const testCases17 = [
 // testAll(testCases14);
 // testAll(testCases15);
 // testAll(testCases16);
-testAll(testCases17);
+// testAll(testCases17);
+// testAll(testCases18);
+testAll(testCases19);
