@@ -1,11 +1,15 @@
-const numberSort = function (array) {
+const numberSortAsc = function (array) {
   return array.sort((a, b) => a - b);
 };
 
-const generateRange = function (maxLimit) {
+const numberSortDesc = function (array) {
+  return array.sort((a, b) => b - a);
+};
+
+const getRange = function (start, end, steps) {
   const range = [];
 
-  for (let i = 0; i < maxLimit; i++) {
+  for (let i = start; i < end; i += steps) {
     range.push(i);
   }
 
@@ -253,9 +257,18 @@ const uniqueCharactersOf = function (strings) {
 
 //---------------------------------------------------------------------------//
 // generate ranges from [3, 5, 2] => [[0, 1, 2], [0, 1, 2, 3, 4], [0, 1]]
+const generateRangeFromZero = function (maxLimit) {
+  const range = [];
+
+  for (let i = 0; i < maxLimit; i++) {
+    range.push(i);
+  }
+
+  return range;
+};
 
 const rangesOf = function (numbers) {
-  return numbers.map(generateRange);
+  return numbers.map(generateRangeFromZero);
 };
 
 //---------------------------------------------------------------------------//
@@ -494,20 +507,20 @@ const normalizeStringLengths = function (strings) {
 // normalize strings by centering them based on the longest string length in ["cat", "elephant", "dog"] => ["  cat   ", "elephant", "  dog   "]
 // (pad with spaces to justify to the center)
 
-const justify = function (longestString) {
+const justify = function (longest) {
   return function (string) {
-    const startSpace = Math.floor((longestString.length - string.length) / 2);
+    const startSpace = Math.floor((longest - string.length) / 2);
 
-    return string
-      .padStart(startSpace + string.length)
-      .padEnd(longestString.length);
+    return string.padStart(startSpace + string.length).padEnd(longest);
   };
 };
 
 const centerJustifyStrings = function (strings) {
-  const longestString = strings.reduce(findLongestString, "");
+  const longest = strings
+    .map((string) => string.length)
+    .reduce(findLargest, -Infinity);
 
-  return strings.map(justify(longestString));
+  return strings.map(justify(longest));
 };
 
 //---------------------------------------------------------------------------//
@@ -543,6 +556,133 @@ const markLargestNumber = function (numbers) {
   const largest = numbers.reduce(findLargest, -Infinity);
 
   return numbers.map((element) => element === largest);
+};
+
+//---------------------------------------------------------------------------//
+// normalize scores based on a curve: first find the max score, then subtract the mean, and scale the results to a range of 0-100 in [{ name: "Alice", score: 80 }, { name: "Bob", score: 100 }, { name: "Charlie", score: 90 }] => [60, 100, 80]
+// Steps: Find max score, calculate mean, normalize each score.
+
+const normalizeWithCurve = function (objects) {};
+
+//---------------------------------------------------------------------------//
+// group students by their grades: first categorize them into A, B, C, and so on, then map each student to their respective category in [{ name: "Alice", grade: 85 }, { name: "Bob", grade: 92 }] => [['Alice', 'B'], ['Bob', 'A']]
+// Steps: Categorize grades, then group students by category.
+
+const categorizeGrades = function (score) {
+  const categories = [
+    getRange(0, 35, 1),
+    getRange(35, 50, 1),
+    getRange(50, 75, 1),
+    getRange(75, 90, 1),
+    getRange(90, 100, 1),
+  ];
+
+  const groupGrades = { 0: "F", 1: "D", 2: "C", 3: "B", 4: "A" };
+
+  const key = categories.reduce((value, range, index) => {
+    if (range.includes(score)) {
+      return index;
+    }
+    return value;
+  }, categories.length);
+
+  return groupGrades[key];
+};
+
+const groupByGrade = function (objects) {
+  return objects.map((record) => [record.name, categorizeGrades(record.grade)]);
+};
+
+//---------------------------------------------------------------------------//
+// sort strings by length first, and then alphabetically if lengths are equal in ["cat", "mango", "banana", "apple", "kiwi"] => ["cat", "kiwi", "apple", "mango", "banana"]
+// Steps: Sort by length, then by lexicographical order.
+
+const sortByLengthAndAlphabet = function (strings) {
+  return strings.sort((a, b) => {
+    if (a.length < b.length) {
+      return -1;
+    }
+
+    if (a.length === b.length) {
+      return a < b ? -1 : 1;
+    }
+
+    return 1;
+  });
+};
+
+//---------------------------------------------------------------------------//
+// find the difference between the max and min values, and then normalize the array based on this range in [10, 20, 30, 5] => [0.25, 0.75, 1, 0]
+// Steps: Find min, max, calculate range, then normalize each value.
+
+const normalizeByRange = function (numbers) {};
+
+//---------------------------------------------------------------------------//
+// calculate the percentage of each number relative to the total sum of the array, and then sort the percentages in descending order in [100, 200, 50, 25] => [50, 25, 12.5, 12.5]
+// Steps: Calculate sum, find percentage of each number, sort in descending order.
+//x * 100 / sum
+
+const percentageOfTotalSorted = function (numbers) {
+  const totalSum = cumulativeSumsOf(numbers).at(-1);
+  const percentages = numbers.map((x) => (x * 100) / totalSum);
+
+  return numberSortDesc(percentages);
+};
+
+//---------------------------------------------------------------------------//
+// map a list of students' grades in multiple subjects to their average score, and then sort the averages in descending order in [{ name: "Alice", grades: [80, 90, 85] }, { name: "Bob", grades: [70, 75, 80] }] => [{ name: "Alice", avg: 85 }, { name: "Bob", avg: 75 }]
+// Steps: Calculate average for each student, then sort by average score.
+
+const sortStudentsByAverage = function (students) {
+  const newRecord = students.map(({ name, grades }) => {
+    const object = { name };
+
+    object.avg = cumulativeSumsOf(grades).at(-1) / grades.length;
+
+    return object;
+  });
+
+  return newRecord.sort((a, b) => b.avg - a.avg);
+};
+
+//---------------------------------------------------------------------------//
+// map a list of numbers to their corresponding binary representation and then group them into arrays of equal lengths in [1, 2, 3, 4, 5] => [["1"], ["10"], ["11"], ["100"], ["101"]]
+// Steps: Convert numbers to binary, then group them into arrays.
+const convertToBinary = function (number) {
+  const binary = [];
+  let i = number;
+
+  while (i > 0) {
+    binary.unshift(i % 2);
+    i = Math.floor(i / 2);
+  }
+
+  return [binary.join("")];
+};
+
+const mapToBinaryAndGroup = function (numbers) {
+  return numbers.map(convertToBinary);
+};
+
+//---------------------------------------------------------------------------//
+// flatten an array of arrays into a single array and then filter out only the even numbers in [[1, 2, 3], [4, 5], [6, 7, 8]] => [2, 4, 6, 8]
+// Steps: Flatten the arrays into one, then filter for even numbers.
+
+const flattenAndFilterEven = function (arrays) {
+  return arrays
+    .flatMap((array) => array.flatMap((value) => value))
+    .filter((value) => value % 2 === 0);
+};
+
+//---------------------------------------------------------------------------//
+// from an array of arrays, where each array contains [name, age], return an array of names of people who are over 18, and then sort them alphabetically in [["Alice", 25], ["Bob", 17], ["Charlie", 22]] => ["Alice", "Charlie"]
+// Steps: Filter for age > 18, then sort by name.
+
+const filterAdultsAndSort = function (arrays) {
+  return arrays
+    .filter((data) => data[1] >= 18)
+    .flatMap((data) => data[0])
+    .sort();
 };
 
 //---------------------------------------------------------------------------//
@@ -990,56 +1130,136 @@ const testAll = function (testCasesArray) {
       [2, 1, 3],
     ],
   ];
-}
-const testCases45 = [
-  [
-    calculateRanks,
+
+  const testCases45 = [
     [
-      { name: "Alice", score: 80 },
-      { name: "Bob", score: 100 },
-      { name: "Charlie", score: 90 },
+      calculateRanks,
+      [
+        { name: "Alice", score: 80 },
+        { name: "Bob", score: 100 },
+        { name: "Charlie", score: 90 },
+      ],
+      [2, 1, 3],
     ],
-    [2, 1, 3],
-  ],
-];
+  ];
 
-const testCases46 = [
+  const testCases46 = [
+    [
+      normalizeStringLengths,
+      ["cat", "elephant", "dog"],
+      ["cat     ", "elephant", "dog     "],
+    ],
+  ];
+
+  const testCases47 = [
+    [
+      centerJustifyStrings,
+      ["cat", "elephant", "dog"],
+      ["  cat   ", "elephant", "  dog   "],
+    ],
+  ];
+
+  const testCases48 = [[scaleToMax100, [20, 50, 80], [25, 62.5, 100]]];
+
+  const testCases49 = [[differencesFromMean, [10, 20, 30], [-10, 0, 10]]];
+
+  const testCases50 = [
+    [
+      stringFrequencies,
+      ["apple", "banana", "apple", "apple", "banana"],
+      [3, 2, 3, 3, 2],
+    ],
+  ];
+
+  const testCases51 = [[markLargestNumber, [1, 5, 2], [false, true, false]]];
+}
+
+const testCases52 = [
   [
-    normalizeStringLengths,
-    ["cat", "elephant", "dog"],
-    ["cat     ", "elephant", "dog     "],
+    groupByGrade,
+    [
+      { name: "Alice", grade: 85 },
+      { name: "Bob", grade: 92 },
+    ],
+    [
+      ["Alice", "B"],
+      ["Bob", "A"],
+    ],
   ],
 ];
 
-const testCases47 = [
+const testCases53 = [
   [
-    centerJustifyStrings,
-    ["cat", "elephant", "dog"],
-    ["  cat   ", "elephant", "  dog   "],
+    sortByLengthAndAlphabet,
+    ["sam", "cat", "mango", "banana", "apple", "kiwi"],
+    ["cat", "sam", "kiwi", "apple", "mango", "banana"],
   ],
 ];
 
-const testCases48 = [[scaleToMax100, [20, 50, 80], [25, 62.5, 100]]];
+const testCases54 = [
+  [percentageOfTotalSorted, [100, 200, 50, 25], [50, 25, 12.5, 12.5]],
+];
 
-const testCases49 = [[differencesFromMean, [10, 20, 30], [-10, 0, 10]]];
-
-const testCases50 = [
+const testCases55 = [
   [
-    stringFrequencies,
-    ["apple", "banana", "apple", "apple", "banana"],
-    [3, 2, 3, 3, 2],
+    sortStudentsByAverage,
+    [
+      { name: "Alice", grades: [80, 90, 85] },
+      { name: "Bob", grades: [70, 75, 80] },
+    ],
+    [
+      { name: "Alice", avg: 85 },
+      { name: "Bob", avg: 75 },
+    ],
   ],
 ];
 
-const testCases51 = [[markLargestNumber, [1, 5, 2], [false, true, false]]];
+const testCases56 = [
+  [
+    mapToBinaryAndGroup,
+    [1, 2, 3, 4, 5],
+    [["1"], ["10"], ["11"], ["100"], ["101"]],
+  ],
+];
 
-testAll(testCases51);
+const testCases57 = [
+  [
+    flattenAndFilterEven,
+    [
+      [1, 2, 3],
+      [4, 5],
+      [6, 7, 8],
+    ],
+    [2, 4, 6, 8],
+  ],
+];
+
+const testCases58 = [
+  [
+    filterAdultsAndSort,
+    [
+      ["Charlie", 22],
+      ["Bob", 17],
+      ["Alice", 25],
+    ],
+    ["Alice", "Charlie"],
+  ],
+];
+
+testAll(testCases58);
+// testAll(testCases57);
+// testAll(testCases56);
+// testAll(testCases55);
+// testAll(testCases54);
+// testAll(testCases53);
+// testAll(testCases52);
+// testAll(testCases51);
 // testAll(testCases50);
 // testAll(testCases49);
 // testAll(testCases48);
 // testAll(testCases47);
 // testAll(testCases46);
-// testAll(testCases45);---------
+// testAll(testCases45); //---------
 // testAll(testCases44);
 // testAll(testCases43);
 // testAll(testCases42);
