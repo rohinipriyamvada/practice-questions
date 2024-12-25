@@ -359,7 +359,38 @@ const isAdult = function (objects) {
 // create abbreviations from [{ city: "New York", country: "USA" },
 //{ city: "Los Angeles", country: "USA" }] => ["NY, USA", "LA, USA"]
 
-const abbreviations = function (objects) {};
+const convertAndSlice = function (word) {
+  return convertFirstLetter(word).slice(0, 1);
+};
+
+const abbreviate = function ({ city, country }) {
+  const abbcity = city.split(" ").map(convertAndSlice).join("");
+  let abbcountry = "";
+
+  if (country.toUpperCase() !== country) {
+    abbcountry = country.split(" ").map(convertAndSlice).join("");
+  }
+
+  return abbcity.concat(", ", abbcountry);
+};
+
+const abbreviations = function (objects) {
+  return objects.map((countryAndCity) => abbreviate(countryAndCity));
+};
+
+//---------------------------------------------------------------------------//
+// extract scores for math tests from [{ name: "Alice", scores: { math: 90, english: 85 } }, { name: "Bob", scores: { math: 80, english: 75 } }] => [90, 80]
+
+const mathScores = function (objects) {
+  return objects.map((person) => person.scores.math);
+};
+
+//---------------------------------------------------------------------------//
+// extract coordinates from [{ x: 1, y: 2 }, { x: 3, y: 4 }] => [[1, 2], [3, 4]]
+
+const extractCoordinates = function (objects) {
+  return objects.map(({ x, y }) => [x, y]);
+};
 
 //---------------------------------------------------------------------------//
 //---------------------------------------------------------------------------//
@@ -650,45 +681,88 @@ const testAll = function (testCasesArray) {
       [6, 20],
     ],
   ];
+
+  const testCases30 = [
+    [extractFlags, [{ active: true }, { active: false }], [true, false]],
+  ];
+
+  const testCases31 = [
+    [
+      fullNames,
+      [
+        { firstName: "Alice", lastName: "Smith" },
+        { firstName: "Bob", lastName: "Brown" },
+      ],
+      ["Alice Smith", "Bob Brown"],
+    ],
+  ];
+
+  const testCases32 = [
+    [
+      totalPrices,
+      [
+        { price: 10, quantity: 2 },
+        { price: 5, quantity: 4 },
+      ],
+      [20, 20],
+    ],
+  ];
+
+  const testCases33 = [
+    [
+      isAdult,
+      [
+        { name: "Alice", age: 17 },
+        { name: "Bob", age: 22 },
+      ],
+      [false, true],
+    ],
+  ];
+
+  const testCases34 = [
+    [
+      abbreviations,
+      [
+        { city: "New York", country: "United States America" },
+        { city: "Los Angeles", country: "United States America" },
+      ],
+      ["NY, USA", "LA, USA"],
+    ],
+  ];
+
+  const testCases35 = [
+    [
+      mathScores,
+      [
+        { name: "Alice", scores: { math: 90, english: 85 } },
+        { name: "Bob", scores: { math: 80, english: 75 } },
+      ],
+      [90, 80],
+    ],
+  ];
 }
-const testCases30 = [
-  [extractFlags, [{ active: true }, { active: false }], [true, false]],
-];
 
-const testCases31 = [
+const testCases36 = [
   [
-    fullNames,
+    extractCoordinates,
     [
-      { firstName: "Alice", lastName: "Smith" },
-      { firstName: "Bob", lastName: "Brown" },
+      { x: 1, y: 2 },
+      { x: 3, y: 4 },
     ],
-    ["Alice Smith", "Bob Brown"],
+    [
+      [1, 2],
+      [3, 4],
+    ],
   ],
 ];
 
-const testCases32 = [
-  [
-    totalPrices,
-    [
-      { price: 10, quantity: 2 },
-      { price: 5, quantity: 4 },
-    ],
-    [20, 20],
-  ],
-];
+const testCases37 = [];
 
-const testCases33 = [
-  [
-    isAdult,
-    [
-      { name: "Alice", age: 17 },
-      { name: "Bob", age: 22 },
-    ],
-    [false, true],
-  ],
-];
-
-testAll(testCases33);
+testAll(testCases37);
+// testAll(testCases36);
+// testAll(testCases35);
+// testAll(testCases34);
+// testAll(testCases33);
 // testAll(testCases33);
 // testAll(testCases32);
 // testAll(testCases31);
