@@ -1,3 +1,38 @@
+const numberSort = function (array) {
+  return array.sort((a, b) => a - b);
+};
+
+const generateRange = function (maxLimit) {
+  const range = [];
+
+  for (let i = 0; i < maxLimit; i++) {
+    range.push(i);
+  }
+
+  return range;
+};
+
+const occurances = function (list) {
+  return function (element) {
+    return list.filter((value) => value === element).length;
+  };
+};
+
+const findSmallest = function (small, element) {
+  if (element < small) {
+    return element;
+  }
+
+  return small;
+};
+
+const findLargest = function (big, element) {
+  if (element > big) {
+    return element;
+  }
+
+  return big;
+};
 // squares of [1, 2, 3] => [1, 4, 9]
 
 const squaresOf = function (numbers) {
@@ -219,16 +254,6 @@ const uniqueCharactersOf = function (strings) {
 //---------------------------------------------------------------------------//
 // generate ranges from [3, 5, 2] => [[0, 1, 2], [0, 1, 2, 3, 4], [0, 1]]
 
-const generateRange = function (maxLimit) {
-  const range = [];
-
-  for (let i = 0; i < maxLimit; i++) {
-    range.push(i);
-  }
-
-  return range;
-};
-
 const rangesOf = function (numbers) {
   return numbers.map(generateRange);
 };
@@ -261,12 +286,8 @@ const wordLengthsOf = function (strings) {
 //---------------------------------------------------------------------------//
 // flatten nested arrays of [[1, [2, 3]], [4, [5, 6]]] => [[1, 2, 3], [4, 5, 6]]
 
-const flatArray = function (array) {
-  return array.flatMap((num) => num);
-};
-
 const flattenedArraysOf = function (arrays) {
-  return arrays.map(flatArray);
+  return arrays.map((array) => array.flatMap((num) => num));
 };
 
 //---------------------------------------------------------------------------//
@@ -371,7 +392,7 @@ const abbreviate = function ({ city, country }) {
     abbcountry = country.split(" ").map(convertAndSlice).join("");
   }
 
-  return abbcity.concat(", ", abbcountry);
+  return [abbcity, abbcountry].join(", ");
 };
 
 const abbreviations = function (objects) {
@@ -392,6 +413,139 @@ const extractCoordinates = function (objects) {
   return objects.map(({ x, y }) => [x, y]);
 };
 
+//---------------------------------------------------------------------------//
+// extract full name and age from [{ firstName: "Alice", lastName: "Smith", age: 25 }, { firstName: "Bob", lastName: "Brown", age: 30 }] => [["Alice Smith", 25], ["Bob Brown", 30]]
+
+const fullNameAndAge = function (objects) {
+  return objects.map(({ firstName, lastName, age }) => [
+    [firstName, lastName].join(" "),
+    age,
+  ]);
+};
+
+//---------------------------------------------------------------------------//
+// extract scores from [{ name: "Alice", scores: { math: 90, english: 85 } }, { name: "Bob", scores: { math: 80, english: 75 } }] => [[90, 85], [80, 75]]
+
+const extractScores = function (objects) {
+  return objects.map(({ scores }) => Object.values(scores));
+};
+
+//---------------------------------------------------------------------------//
+// extract key-value pairs from [{ key: "a", value: 1 }, { key: "b", value: 2 }] => [["a", 1], ["b", 2]]
+
+const keyValuePairs = function (objects) {
+  return objects.map(({ key, value }) => [key, value]);
+};
+
+//---------------------------------------------------------------------------//
+// split full names into first and last names from [{ name: "Alice Smith" }, { name: "Bob Brown" }] => [["Alice", "Smith"], ["Bob", "Brown"]]
+
+const splitFullNames = function (objects) {
+  return objects.map(({ name }) => name.split(" "));
+};
+
+//---------------------------------------------------------------------------//
+// normalize scores so they fall between 0 and 1 based on the max score from [{ name: "Alice", score: 80 }, { name: "Bob", score: 100 }] => [0.8, 1]
+
+const normalizeScores = function (objects) {
+  const maxScore = 100;
+
+  return objects.map(({ score }) => score / maxScore);
+};
+
+//---------------------------------------------------------------------------//
+// calculate percentage contribution of each number in [10, 20, 30] (relative to the total sum) => [16.67, 33.33, 50]
+
+const percentageContributions = function (numbers) {
+  const totalSum = cumulativeSumsOf(numbers).at(-1);
+
+  return numbers.map((num) => Math.round(((num * 100) / totalSum) * 100) / 100);
+};
+
+//---------------------------------------------------------------------------//
+// subtract the smallest number from each number in [3, 8, 1] => [2, 7, 0]
+
+const subtractMin = function (numbers) {
+  const smallest = numbers.reduce(findSmallest, Infinity);
+
+  return numbers.map((num) => num - smallest);
+};
+
+//---------------------------------------------------------------------------//
+// calculate ranks (1-based, descending) for scores in [{ name: "Alice", score: 80 }, { name: "Bob", score: 100 }, { name: "Charlie", score: 90 }] => [2, 1, 3]
+
+const calculateRanks = function (objects) {
+  return objects.map(({ score }) => score);
+};
+
+//---------------------------------------------------------------------------//
+// normalize strings by the longest string length in ["cat", "elephant", "dog"] => ["cat    ", "elephant", "dog    "]
+// (pad with spaces to match the longest length)
+
+const normalizeStringLengths = function (strings) {
+  const longest = strings
+    .map((string) => string.length)
+    .reduce(findLargest, -Infinity);
+
+  return strings.map((string) => string.padEnd(longest));
+};
+
+//---------------------------------------------------------------------------//
+// normalize strings by centering them based on the longest string length in ["cat", "elephant", "dog"] => ["  cat   ", "elephant", "  dog   "]
+// (pad with spaces to justify to the center)
+
+const justify = function (longestString) {
+  return function (string) {
+    const startSpace = Math.floor((longestString.length - string.length) / 2);
+
+    return string
+      .padStart(startSpace + string.length)
+      .padEnd(longestString.length);
+  };
+};
+
+const centerJustifyStrings = function (strings) {
+  const longestString = strings.reduce(findLongestString, "");
+
+  return strings.map(justify(longestString));
+};
+
+//---------------------------------------------------------------------------//
+// scale all numbers proportionally so the largest number becomes 100 in [20, 50, 80] => [25, 62.5, 100]
+
+const scaleToMax100 = function (numbers) {
+  const largest = numbers.reduce(findLargest, -Infinity);
+  const proportion = 100 / largest;
+
+  return numbers.map((number) => number * proportion);
+};
+
+//---------------------------------------------------------------------------//
+// map each number to the difference between it and the average of the array in [10, 20, 30] => [-10, 0, 10]
+
+const differencesFromMean = function (numbers) {
+  const average = cumulativeSumsOf(numbers).at(-1) / numbers.length;
+
+  return numbers.map((num) => num - average);
+};
+
+//---------------------------------------------------------------------------//
+// map each string to its frequency in ["apple", "banana", "apple", "apple", "banana"] => [3, 2, 3, 3, 2]
+
+const stringFrequencies = function (strings) {
+  return strings.map(occurances(strings));
+};
+
+//---------------------------------------------------------------------------//
+// mark the largest number in an array as true, others as false in [1, 3, 2] => [false, true, false]
+
+const markLargestNumber = function (numbers) {
+  const largest = numbers.reduce(findLargest, -Infinity);
+
+  return numbers.map((element) => element === largest);
+};
+
+//---------------------------------------------------------------------------//
 //---------------------------------------------------------------------------//
 //---------------------------------------------------------------------------//
 //---------------------------------Testing-----------------------------------//
@@ -740,25 +894,160 @@ const testAll = function (testCasesArray) {
       [90, 80],
     ],
   ];
-}
 
-const testCases36 = [
+  const testCases36 = [
+    [
+      extractCoordinates,
+      [
+        { x: 1, y: 2 },
+        { x: 3, y: 4 },
+      ],
+      [
+        [1, 2],
+        [3, 4],
+      ],
+    ],
+  ];
+
+  const testCases37 = [
+    [
+      fullNameAndAge,
+      [
+        { firstName: "Alice", lastName: "Smith", age: 25 },
+        { firstName: "Bob", lastName: "Brown", age: 30 },
+      ],
+      [
+        ["Alice Smith", 25],
+        ["Bob Brown", 30],
+      ],
+    ],
+  ];
+
+  const testCases38 = [
+    [
+      extractScores,
+      [
+        { name: "Alice", scores: { math: 90, english: 85 } },
+        { name: "Bob", scores: { math: 80, english: 75 } },
+      ],
+      [
+        [90, 85],
+        [80, 75],
+      ],
+    ],
+  ];
+
+  const testCases39 = [
+    [
+      keyValuePairs,
+      [
+        { key: "a", value: 1 },
+        { key: "b", value: 2 },
+      ],
+      [
+        ["a", 1],
+        ["b", 2],
+      ],
+    ],
+  ];
+
+  const testCases40 = [
+    [
+      splitFullNames,
+      [{ name: "Alice Smith" }, { name: "Bob Brown" }],
+      [
+        ["Alice", "Smith"],
+        ["Bob", "Brown"],
+      ],
+    ],
+  ];
+
+  const testCases41 = [
+    [
+      normalizeScores,
+      [
+        { name: "Alice", score: 80 },
+        { name: "Bob", score: 100 },
+      ],
+      [0.8, 1],
+    ],
+  ];
+
+  const testCases42 = [
+    [percentageContributions, [10, 20, 30], [16.67, 33.33, 50]],
+  ];
+
+  const testCases43 = [[subtractMin, [3, 8, 1], [2, 7, 0]]];
+
+  const testCases44 = [
+    [
+      calculateRanks,
+      [
+        { name: "Alice", score: 80 },
+        { name: "Bob", score: 100 },
+        { name: "Charlie", score: 90 },
+      ],
+      [2, 1, 3],
+    ],
+  ];
+}
+const testCases45 = [
   [
-    extractCoordinates,
+    calculateRanks,
     [
-      { x: 1, y: 2 },
-      { x: 3, y: 4 },
+      { name: "Alice", score: 80 },
+      { name: "Bob", score: 100 },
+      { name: "Charlie", score: 90 },
     ],
-    [
-      [1, 2],
-      [3, 4],
-    ],
+    [2, 1, 3],
   ],
 ];
 
-const testCases37 = [];
+const testCases46 = [
+  [
+    normalizeStringLengths,
+    ["cat", "elephant", "dog"],
+    ["cat     ", "elephant", "dog     "],
+  ],
+];
 
-testAll(testCases37);
+const testCases47 = [
+  [
+    centerJustifyStrings,
+    ["cat", "elephant", "dog"],
+    ["  cat   ", "elephant", "  dog   "],
+  ],
+];
+
+const testCases48 = [[scaleToMax100, [20, 50, 80], [25, 62.5, 100]]];
+
+const testCases49 = [[differencesFromMean, [10, 20, 30], [-10, 0, 10]]];
+
+const testCases50 = [
+  [
+    stringFrequencies,
+    ["apple", "banana", "apple", "apple", "banana"],
+    [3, 2, 3, 3, 2],
+  ],
+];
+
+const testCases51 = [[markLargestNumber, [1, 5, 2], [false, true, false]]];
+
+testAll(testCases51);
+// testAll(testCases50);
+// testAll(testCases49);
+// testAll(testCases48);
+// testAll(testCases47);
+// testAll(testCases46);
+// testAll(testCases45);---------
+// testAll(testCases44);
+// testAll(testCases43);
+// testAll(testCases42);
+// testAll(testCases41);
+// testAll(testCases40);
+// testAll(testCases39);
+// testAll(testCases38);
+// testAll(testCases37);
 // testAll(testCases36);
 // testAll(testCases35);
 // testAll(testCases34);
