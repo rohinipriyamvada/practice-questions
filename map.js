@@ -22,21 +22,23 @@ const occurances = function (list) {
   };
 };
 
-const findSmallest = function (small, element) {
-  if (element < small) {
-    return element;
-  }
+const groupBy = (object, identifier) => {
+  const formGroup = (group, [key, value]) => {
+    if (!Object.keys(group).includes(key.toString())) {
+      group[key] = [];
+    }
 
-  return small;
+    group[key].push(value);
+    return { ...group };
+  };
+
+  return object
+    .map((value) => [identifier(value), value])
+    .reduce(formGroup, {});
 };
 
-const findLargest = function (big, element) {
-  if (element > big) {
-    return element;
-  }
+const isEven = (number) => number % 2 === 0;
 
-  return big;
-};
 // squares of [1, 2, 3] => [1, 4, 9]
 
 const squaresOf = function (numbers) {
@@ -129,14 +131,8 @@ const charCodesOf = function (strings) {
 // extract domain names from
 //["user1@gmail.com", "admin@yahoo.com"] => ["gmail.com", "yahoo.com"]
 
-const getDomain = function (email) {
-  const domainStart = email.indexOf("@");
-
-  return email.slice(domainStart + 1);
-};
-
 const domainNamesOf = function (emails) {
-  return emails.map(getDomain);
+  return emails.map((email) => email.split("@").at(-1));
 };
 
 //---------------------------------------------------------------------------//
@@ -208,22 +204,17 @@ const withoutVowelsOf = function (strings) {
 // cumulative sums of [[1, 2, 3], [4, 5, 6]] => [[1, 3, 6], [4, 9, 15]]
 // Example: cumulative sum of [1, 2, 3] is [1, 1+2, 1+2+3]
 
-const sumUp = function () {
+const cumulativeSum = (array) => {
   let sum = 0;
 
-  return function (element, index) {
-    if (index === 0) {
-      sum = element;
-      return sum;
-    }
-
-    sum += element;
+  return array.map((number) => {
+    sum += number;
     return sum;
-  };
+  });
 };
 
 const cumulativeSumsOf = function (arrays) {
-  return arrays.map(sumUp());
+  return arrays.map(cumulativeSum);
 };
 
 //---------------------------------------------------------------------------//
@@ -275,14 +266,15 @@ const rangesOf = function (numbers) {
 // capitalize first letters of ["hello world", "goodbye moon"] =>
 //["Hello World", "Goodbye Moon"]
 
-const convertToUpper = function ([...chars]) {
-  chars[0] = chars[0].toUpperCase();
-
-  return chars.join("");
-};
-
 const convertFirstLetter = function (word) {
-  return word.split(" ").map(convertToUpper).join(" ");
+  return word
+    .split(" ")
+    .map(([...chars]) => {
+      chars[0] = chars[0].toUpperCase();
+
+      return chars.join("");
+    })
+    .join(" ");
 };
 
 const capitalizedFirstLettersOf = function (strings) {
@@ -313,29 +305,27 @@ const sortedLettersOf = function (strings) {
 //---------------------------------------------------------------------------//
 // wrap strings in brackets ["apple", "banana"] => ["[apple]", "[banana]"]
 
-const addBrackets = function ([...string]) {
-  string.unshift("[");
-  string.push("]");
-
-  return string.join("");
-};
-
 const wrappedStringsOf = function (strings) {
-  return strings.map(addBrackets);
+  return strings.map(([...string]) => {
+    string.unshift("[");
+    string.push("]");
+
+    return string.join("");
+  });
 };
 
 //---------------------------------------------------------------------------//
 // extract names from [{ name: "Alice" }, { name: "Bob" }] => ["Alice", "Bob"]
 
 const extractNames = function (objects) {
-  return objects.map((record) => record.name);
+  return objects.map(({ name }) => name);
 };
 
 //---------------------------------------------------------------------------//
 // extract ages from [{ age: 25 }, { age: 30 }] => [25, 30]
 
 const extractAges = function (objects) {
-  return objects.map((record) => record.age);
+  return objects.map(({ age }) => age);
 };
 
 //---------------------------------------------------------------------------//
@@ -343,7 +333,7 @@ const extractAges = function (objects) {
 // => ["A", "B"]
 
 const firstLettersOfNames = function (objects) {
-  return objects.map((record) => record.name[0]);
+  return objects.map(({ name }) => name[0]);
 };
 
 //---------------------------------------------------------------------------//
@@ -351,7 +341,7 @@ const firstLettersOfNames = function (objects) {
 // => [6, 20]
 
 const calculateAreas = function (rectangles) {
-  return rectangles.map((dimensions) => dimensions.width * dimensions.height);
+  return rectangles.map(({ width, height }) => width * height);
 };
 
 //---------------------------------------------------------------------------//
@@ -359,16 +349,16 @@ const calculateAreas = function (rectangles) {
 //[true, false]
 
 const extractFlags = function (objects) {
-  return objects.map((status) => status.active);
+  return objects.map(({ active }) => active);
 };
 
 //---------------------------------------------------------------------------//
-// concatenate first and last names from
-//[{ firstName: "Alice", lastName: "Smith" },
-//{ firstName: "Bob", lastName: "Brown" }] => ["Alice Smith", "Bob Brown"]
+// concatenate first and last names from [{ firstName: "Alice", lastName: "Smith" }, { firstName: "Bob", lastName: "Brown" }] => ["Alice Smith", "Bob Brown"]
 
 const fullNames = function (objects) {
-  return objects.map((record) => record.firstName + " " + record.lastName);
+  return objects.map(({ firstName, lastName }) =>
+    [firstName, lastName].join(" ")
+  );
 };
 
 //---------------------------------------------------------------------------//
@@ -386,44 +376,46 @@ const totalPrices = function (objects) {
 // (age >= 18)
 
 const isAdult = function (objects) {
-  return objects.map((record) => record.age >= 18);
+  return objects.map(({ age }) => age >= 18);
 };
 
 //---------------------------------------------------------------------------//
 // create abbreviations from [{ city: "New York", country: "USA" },
 //{ city: "Los Angeles", country: "USA" }] => ["NY, USA", "LA, USA"]
 
-const convertAndSlice = function (word) {
-  return convertFirstLetter(word).slice(0, 1);
+const extractFirstLetterCapitalized = function (word) {
+  return word.at(0).toUpperCase();
 };
 
+const isAllUpperCase = (string) => string.toUpperCase() === string;
+
+const generateAbbreviations = (string) =>
+  string.split(" ").map(extractFirstLetterCapitalized).join("");
+
 const abbreviate = function ({ city, country }) {
-  const abbcity = city.split(" ").map(convertAndSlice).join("");
-  let abbcountry = "";
+  const abbreviatedCountry = isAllUpperCase(country)
+    ? country
+    : generateAbbreviations(country);
 
-  if (country.toUpperCase() !== country) {
-    abbcountry = country.split(" ").map(convertAndSlice).join("");
-  }
-
-  return [abbcity, abbcountry].join(", ");
+  return [generateAbbreviations(city), abbreviatedCountry].join(", ");
 };
 
 const abbreviations = function (objects) {
-  return objects.map((countryAndCity) => abbreviate(countryAndCity));
+  return objects.map((location) => abbreviate(location));
 };
 
 //---------------------------------------------------------------------------//
 // extract scores for math tests from [{ name: "Alice", scores: { math: 90, english: 85 } }, { name: "Bob", scores: { math: 80, english: 75 } }] => [90, 80]
 
 const mathScores = function (objects) {
-  return objects.map((person) => person.scores.math);
+  return objects.map(({ scores }) => scores.math);
 };
 
 //---------------------------------------------------------------------------//
 // extract coordinates from [{ x: 1, y: 2 }, { x: 3, y: 4 }] => [[1, 2], [3, 4]]
 
 const extractCoordinates = function (objects) {
-  return objects.map(({ x, y }) => [x, y]);
+  return objects.map((object) => Object.values(object));
 };
 
 //---------------------------------------------------------------------------//
@@ -447,7 +439,7 @@ const extractScores = function (objects) {
 // extract key-value pairs from [{ key: "a", value: 1 }, { key: "b", value: 2 }] => [["a", 1], ["b", 2]]
 
 const keyValuePairs = function (objects) {
-  return objects.map(({ key, value }) => [key, value]);
+  return objects.map((object) => Object.values(object));
 };
 
 //---------------------------------------------------------------------------//
@@ -460,8 +452,17 @@ const splitFullNames = function (objects) {
 //---------------------------------------------------------------------------//
 // normalize scores so they fall between 0 and 1 based on the max score from [{ name: "Alice", score: 80 }, { name: "Bob", score: 100 }] => [0.8, 1]
 
+// const normalizeScores = function (objects) {
+//   const scores = objects.map(({ score }) => score);
+//   const maxScore = Math.max(...scores);
+//   const minScore = Math.min(...scores);
+
+//   return objects.map(({ score }) => (score - minScore) / (maxScore - minScore));
+// };
+
 const normalizeScores = function (objects) {
-  const maxScore = 100;
+  const scores = objects.map(({ score }) => score);
+  const maxScore = Math.max(...scores);
 
   return objects.map(({ score }) => score / maxScore);
 };
@@ -470,25 +471,27 @@ const normalizeScores = function (objects) {
 // calculate percentage contribution of each number in [10, 20, 30] (relative to the total sum) => [16.67, 33.33, 50]
 
 const percentageContributions = function (numbers) {
-  const totalSum = cumulativeSumsOf(numbers).at(-1);
+  const totalSum = cumulativeSum(numbers).at(-1);
 
-  return numbers.map((num) => Math.round(((num * 100) / totalSum) * 100) / 100);
+  return numbers.map((num) => ((num * 100) / totalSum).toFixed(2));
 };
 
 //---------------------------------------------------------------------------//
 // subtract the smallest number from each number in [3, 8, 1] => [2, 7, 0]
 
 const subtractMin = function (numbers) {
-  const smallest = numbers.reduce(findSmallest, Infinity);
+  const smallest = Math.min(...numbers);
 
   return numbers.map((num) => num - smallest);
 };
 
 //---------------------------------------------------------------------------//
-// calculate ranks (1-based, descending) for scores in [{ name: "Alice", score: 80 }, { name: "Bob", score: 100 }, { name: "Charlie", score: 90 }] => [2, 1, 3]
+// calculate ranks (1-based, descending) for scores in [{ name: "Alice", score: 80 }, { name: "Bob", score: 100 }, { name: "Charlie", score: 90 }] => [3, 1, 2]
 
 const calculateRanks = function (objects) {
-  return objects.map(({ score }) => score);
+  const sortScores = numberSortDesc(objects.map(({ score }) => score));
+
+  return objects.map(({ score }) => sortScores.indexOf(score) + 1);
 };
 
 //---------------------------------------------------------------------------//
@@ -496,9 +499,7 @@ const calculateRanks = function (objects) {
 // (pad with spaces to match the longest length)
 
 const normalizeStringLengths = function (strings) {
-  const longest = strings
-    .map((string) => string.length)
-    .reduce(findLargest, -Infinity);
+  const longest = Math.max(...strings.map((string) => string.length));
 
   return strings.map((string) => string.padEnd(longest));
 };
@@ -516,9 +517,7 @@ const justify = function (longest) {
 };
 
 const centerJustifyStrings = function (strings) {
-  const longest = strings
-    .map((string) => string.length)
-    .reduce(findLargest, -Infinity);
+  const longest = Math.max(...strings.map((string) => string.length));
 
   return strings.map(justify(longest));
 };
@@ -527,7 +526,7 @@ const centerJustifyStrings = function (strings) {
 // scale all numbers proportionally so the largest number becomes 100 in [20, 50, 80] => [25, 62.5, 100]
 
 const scaleToMax100 = function (numbers) {
-  const largest = numbers.reduce(findLargest, -Infinity);
+  const largest = Math.max(...numbers);
   const proportion = 100 / largest;
 
   return numbers.map((number) => number * proportion);
@@ -537,7 +536,7 @@ const scaleToMax100 = function (numbers) {
 // map each number to the difference between it and the average of the array in [10, 20, 30] => [-10, 0, 10]
 
 const differencesFromMean = function (numbers) {
-  const average = cumulativeSumsOf(numbers).at(-1) / numbers.length;
+  const average = cumulativeSum(numbers).at(-1) / numbers.length;
 
   return numbers.map((num) => num - average);
 };
@@ -553,7 +552,7 @@ const stringFrequencies = function (strings) {
 // mark the largest number in an array as true, others as false in [1, 3, 2] => [false, true, false]
 
 const markLargestNumber = function (numbers) {
-  const largest = numbers.reduce(findLargest, -Infinity);
+  const largest = Math.max(...numbers);
 
   return numbers.map((element) => element === largest);
 };
@@ -562,35 +561,29 @@ const markLargestNumber = function (numbers) {
 // normalize scores based on a curve: first find the max score, then subtract the mean, and scale the results to a range of 0-100 in [{ name: "Alice", score: 80 }, { name: "Bob", score: 100 }, { name: "Charlie", score: 90 }] => [60, 100, 80]
 // Steps: Find max score, calculate mean, normalize each score.
 
-const normalizeWithCurve = function (objects) {};
+const normalizeWithCurve = function (objects) {
+  const scores = objects.map(({ score }) => score);
+  const max = Math.max(...scores);
+  const average = cumulativeSum(scores).at(-1) / objects.length;
+
+  return;
+};
 
 //---------------------------------------------------------------------------//
 // group students by their grades: first categorize them into A, B, C, and so on, then map each student to their respective category in [{ name: "Alice", grade: 85 }, { name: "Bob", grade: 92 }] => [['Alice', 'B'], ['Bob', 'A']]
 // Steps: Categorize grades, then group students by category.
 
 const categorizeGrades = function (score) {
-  const categories = [
-    getRange(0, 35, 1),
-    getRange(35, 50, 1),
-    getRange(50, 75, 1),
-    getRange(75, 90, 1),
-    getRange(90, 100, 1),
-  ];
+  const categories = [35, 50, 75, 90, 100];
+  const groupGrades = ["F", "D", "C", "B", "A"];
 
-  const groupGrades = { 0: "F", 1: "D", 2: "C", 3: "B", 4: "A" };
+  const index = categories.findIndex((range) => score < range);
 
-  const key = categories.reduce((value, range, index) => {
-    if (range.includes(score)) {
-      return index;
-    }
-    return value;
-  }, categories.length);
-
-  return groupGrades[key];
+  return groupGrades[index === undefined ? groupGrades.length - 1 : index];
 };
 
 const groupByGrade = function (objects) {
-  return objects.map((record) => [record.name, categorizeGrades(record.grade)]);
+  return objects.map(({ name, grade }) => [name, categorizeGrades(grade)]);
 };
 
 //---------------------------------------------------------------------------//
@@ -614,16 +607,22 @@ const sortByLengthAndAlphabet = function (strings) {
 //---------------------------------------------------------------------------//
 // find the difference between the max and min values, and then normalize the array based on this range in [10, 20, 30, 5] => [0.25, 0.75, 1, 0]
 // Steps: Find min, max, calculate range, then normalize each value.
+// x - min / max - min
 
-const normalizeByRange = function (numbers) {};
+const normalizeByRange = function (numbers) {
+  const max = Math.max(...numbers);
+  const min = Math.min(...numbers);
+
+  return numbers.map((num) => (num - min) / (max - min));
+};
 
 //---------------------------------------------------------------------------//
-// calculate the percentage of each number relative to the total sum of the array, and then sort the percentages in descending order in [100, 200, 50, 25] => [50, 25, 12.5, 12.5]
+// calculate the percentage of each number relative to the total sum of the array, and then sort the percentages in descending order in [100, 200, 50, 50] => [50, 25, 12.5, 12.5]
 // Steps: Calculate sum, find percentage of each number, sort in descending order.
 //x * 100 / sum
 
 const percentageOfTotalSorted = function (numbers) {
-  const totalSum = cumulativeSumsOf(numbers).at(-1);
+  const totalSum = cumulativeSum(numbers).at(-1);
   const percentages = numbers.map((x) => (x * 100) / totalSum);
 
   return numberSortDesc(percentages);
@@ -637,7 +636,7 @@ const sortStudentsByAverage = function (students) {
   const newRecord = students.map(({ name, grades }) => {
     const object = { name };
 
-    object.avg = cumulativeSumsOf(grades).at(-1) / grades.length;
+    object.avg = cumulativeSum(grades).at(-1) / grades.length;
 
     return object;
   });
@@ -671,7 +670,7 @@ const mapToBinaryAndGroup = function (numbers) {
 const flattenAndFilterEven = function (arrays) {
   return arrays
     .flatMap((array) => array.flatMap((value) => value))
-    .filter((value) => value % 2 === 0);
+    .filter(isEven);
 };
 
 //---------------------------------------------------------------------------//
@@ -686,8 +685,660 @@ const filterAdultsAndSort = function (arrays) {
 };
 
 //---------------------------------------------------------------------------//
+// given an array of objects representing sales with date and amount, calculate the total sales for each month and return them as an array of arrays like [[month, total], ...] in [{ date: "2024-01-15", amount: 100 }, { date: "2024-02-10", amount: 150 }, { date: "2024-01-25", amount: 200 }] => [["2024-01", 300], ["2024-02", 150]]
+// Steps: Group by month, sum the sales for each month.
+
+const totalSalesByMonth = function (sales) {
+  const groupedSales = groupBy(sales, ({ date }) => date.split("-")[1]);
+
+  return Object.entries(groupedSales).map(([key, value]) => [
+    value[0].date.split("-").slice(0, 2).join("-"),
+    value.reduce((total, { amount }) => total + amount, 0),
+  ]);
+};
+
 //---------------------------------------------------------------------------//
+// map each employee's department to their total salary, and then return an array of objects with department name and total salary in [{ name: "Alice", department: "HR", salary: 5000 }, { name: "Bob", department: "Engineering", salary: 6000 }, { name: "Charlie", department: "HR", salary: 4500 }] =>
+// [{ department: "HR", totalSalary: 9500 },
+// { department: "Engineering", totalSalary: 6000 }]
+// Steps: Group by department, sum the salaries for each department.
+
+const totalSalaryByDepartment = function (employees) {
+  const groupedEmployees = groupBy(employees, ({ department }) => department);
+
+  return Object.entries(groupedEmployees).map(([department, persons]) => {
+    const obj = { department: department };
+    obj.totalSalary = persons.reduce((total, { salary }) => total + salary, 0);
+
+    return obj;
+  });
+};
+
 //---------------------------------------------------------------------------//
+// for a list of students, return an array of objects that includes the student's name and their highest grade in [{ name: "Alice", grades: { math: 80, science: 90, history: 70 } }, { name: "Bob", grades: { math: 70, science: 85, history: 95 } }] => [{ name: "Alice", highestGrade: 90 }, { name: "Bob", highestGrade: 95 }]
+// Steps: For each student, find the highest grade from their grades object.
+
+const highestGradeByStudent = function (students) {
+  return students.map(({ name, grades }) => {
+    const object = { name };
+
+    object.highestGrade = Math.max(...Object.values(grades));
+    return object;
+  });
+};
+
+//---------------------------------------------------------------------------//
+// for a list of books with authors and publication years, return an array of objects that categorizes books into "old" (published before 2000) and "new" (published after 2000) in [{ title: "Book1", author: "Author1", year: 1999 }, { title: "Book2", author: "Author2", year: 2005 }] =>
+// [{ category: "old", books: [{ title: "Book1", author: "Author1" }] },
+// { category: "new", books: [{ title: "Book2", author: "Author2" }] }]
+// Steps: Categorize by year, group books accordingly.
+
+const categorizeBooksByYear = function (books) {
+  const groupedBooks = groupBy(books, ({ year }) =>
+    year >= 2000 ? "new" : "old"
+  );
+
+  return Object.entries(groupedBooks).map(([key, value]) => {
+    const obj = { category: key, books: value };
+
+    return obj;
+  });
+};
+
+//---------------------------------------------------------------------------//
+// for a list of transactions, return an array of objects where each object contains the user's name and the total amount they spent, grouping by user name in [{ user: "Alice", transaction: { amount: 50, date: "2024-01-01" } },
+// { user: "Bob", transaction: { amount: 30, date: "2024-01-02" } },
+// { user: "Alice", transaction: { amount: 20, date: "2024-01-03" } }] =>
+// [{ user: "Alice", totalSpent: 70 }, { user: "Bob", totalSpent: 30 }]
+// Steps: Group by user, sum the transaction amounts for each user.
+
+const totalSpentByUser = function (transactions) {
+  const groupedTransactions = groupBy(transactions, ({ user }) => user);
+
+  return Object.entries(groupedTransactions).map(([userName, details]) => {
+    const obj = { user: userName };
+    obj.totalSpent = details.reduce(
+      (total, { transaction }) => total + transaction.amount,
+      0
+    );
+
+    return obj;
+  });
+};
+
+//---------------------------------------------------------------------------//
+// given an array of products, each with name, price, and discount, return a list of objects containing the product name and final price (after applying the discount), rounding the final price to two decimal places in
+// [{ name: "Product1", price: 100, discount: 0.1 },
+// { name: "Product2", price: 150, discount: 0.2 }] =>
+// [{ name: "Product1", finalPrice: 90.00 },
+// { name: "Product2", finalPrice: 120.00 }]
+// Steps: Apply discount, calculate final price, round to two decimal places.
+
+const finalPriceAfterDiscount = function (products) {
+  return products.map(({ name, price, discount }) => {
+    const obj = { name };
+    obj.finalPrice = (price - price * discount).toFixed(2) * 1;
+
+    return obj;
+  });
+};
+
+//---------------------------------------------------------------------------//
+// flatten a list of arrays representing orders, where each order contains items, and return a single array of item names in
+// [["item1", "item2"], ["item3", "item4"]] =>
+// ["item1", "item2", "item3", "item4"]
+// Steps: Use `flatMap` to flatten the arrays into a single array of items.
+
+const flattenOrderItems = function (orders) {
+  return orders.flatMap((array) => array);
+};
+
+//---------------------------------------------------------------------------//
+// given a list of objects representing students with their courses, use `flatMap` to return a list of all unique courses that the students are enrolled in : in
+// [{ name: "Alice", courses: ["Math", "History"] },
+// { name: "Bob", courses: ["Math", "Science"] }] =>
+// ["Math", "History", "Science"]
+// Steps: Use `flatMap` to combine all courses into a single array, then filter out duplicates.
+
+const uniqueCourses = function (students) {
+  return students
+    .flatMap(({ courses }) => courses)
+    .reduce((uniqueArray, element) => {
+      if (!uniqueArray.includes(element)) {
+        uniqueArray.push(element);
+      }
+
+      return uniqueArray;
+    }, []);
+};
+
+//---------------------------------------------------------------------------//
+// given a list of users, where each user has a list of messages, return an array of messages that contain the word "urgent" in
+// [{ name: "Alice", messages: ["Urgent: Pay bills", "Meeting at 3"] },
+// { name: "Bob", messages: ["Urgent: Call customer", "Check email"] }] => ["Urgent: Pay bills", "Urgent: Call customer"]
+// Steps: Use `flatMap` to combine all messages, then filter for "urgent" messages.
+
+const urgentMessages = function (users) {
+  return users
+    .flatMap(({ messages }) => [...messages])
+    .filter((message) => message.includes("Urgent"));
+};
+
+//---------------------------------------------------------------------------//
+// given a list of categories, where each category contains multiple tags, use `flatMap` to return a list of all tags in
+// [{ category: "Tech", tags: ["JavaScript", "Node"] },
+// { category: "Design", tags: ["UX", "UI"] }] =>
+// ["JavaScript", "Node", "UX", "UI"]
+// Steps: Use `flatMap` to combine all tags into a single array.
+
+const allTags = function (categories) {
+  return categories.flatMap(({ tags }) => [...tags]);
+};
+
+//---------------------------------------------------------------------------//
+// given a list of people, where each person has a list of friends, use `flatMap` to return a list of all friends, excluding duplicates, in
+// [{ name: "Alice", friends: ["Bob", "Charlie"] },
+// { name: "Bob", friends: ["Alice", "David"] }] =>
+// ["Bob", "Charlie", "David"]
+// Steps: Use `flatMap` to flatten the friends arrays, then remove duplicates.
+
+const allFriends = function (people) {
+  return people
+    .flatMap(({ friends }) => [...friends])
+    .reduce((arr, name) => {
+      if (!arr.includes(name)) {
+        arr.push(name);
+      }
+
+      return arr;
+    }, []);
+};
+
+//---------------------------------------------------------------------------//
+// given an array of strings, return a new array where each string is prefixed with its index (e.g., "0: Alice", "1: Bob") in
+// ["Alice", "Bob", "Charlie"] =>
+// ["0: Alice", "1: Bob", "2: Charlie"]
+// Steps: Use the index parameter in the `map` function to prefix the strings.
+
+const prefixWithIndex = function (names) {
+  return names.map((name, index) => {
+    return [index, name].join(": ");
+  });
+};
+
+//---------------------------------------------------------------------------//
+// given an array of numbers, return a new array where each number is multiplied by its index in [2, 4, 6] => [0, 4, 12]
+// Steps: Use the index parameter in the `map` function to multiply the number by its index.
+
+const multiplyByIndex = function (numbers) {
+  return numbers.map((num, index) => num * index);
+};
+
+//---------------------------------------------------------------------------//
+// given an array of prices, return a new array where each price is discounted by 5% for every index greater than 2, and the discount is 0% for indices less than or equal to 2 in [100, 200, 300, 400, 500] => [100, 200, 300, 380, 475]
+// Steps: Use the index parameter in `map` to conditionally apply the discount.
+
+const discountByIndex = function (prices) {
+  return prices.map((price, index) => {
+    if (index > 2) {
+      return price - (price * 5) / 100;
+    }
+    return price;
+  });
+};
+
+//---------------------------------------------------------------------------//
+// given an array of names, return a new array where each name is formatted as "Name: X", where X is the index of the name, and prepend "Index - " to names at even indices in ["Alice", "Bob", "Charlie"] =>
+// ["Index - 0: Alice", "1: Bob", "Index - 2: Charlie"]
+// Steps: Use the index parameter in `map` to conditionally format the names.
+
+const formatNamesWithIndex = function (names) {
+  return names.map((name, index) => {
+    let string = "";
+
+    if (index % 2 === 0) {
+      string += ["Index - "];
+    }
+
+    return string + [index, name].join(": ");
+  });
+};
+
+//---------------------------------------------------------------------------//
+// given an array of objects with 'name' and 'age' properties, return a new array of strings where each string is "name is age years old" and append "(old)" for every person whose index is greater than or equal to 2 in
+// [{ name: "Alice", age: 30 }, { name: "Bob", age: 25 },
+// { name: "Charlie", age: 35 }] =>
+// ["Alice is 30 years old", "Bob is 25 years old",
+// "Charlie is 35 years old (old)"]
+// Steps: Use the index parameter in `map` to conditionally append "(old)".
+
+const formatNamesWithAge = function (people) {
+  return people.map(({ name, age }, index) => {
+    let string = "";
+    if (index >= 2) {
+      string += " (old)";
+    }
+
+    return [name, "is", age, "years old"].join(" ") + string;
+  });
+};
+
+//---------------------------------------------------------------------------//
+// given an array of posts, each with a list of hashtags, return a flat list of all hashtags used in the posts in
+// [{ post: "Vacation", hashtags: ["#sunny", "#beach"] },
+// { post: "Dinner", hashtags: ["#food", "#yum"] }]
+// => ["#sunny", "#beach", "#food", "#yum"]
+// Steps: Use `flatMap` to extract all hashtags and combine them into a single list.
+
+const extractHashtags = function (posts) {
+  return posts.flatMap(({ hashtags }) => [...hashtags]);
+};
+
+//---------------------------------------------------------------------------//
+// given an array of users, each with a list of followers, return an array where each user is paired with the number of their followers
+// [{ username: "alice", followers: ["bob", "charlie"] },
+// { username: "bob", followers: ["alice"] }]
+// => [{ username: "alice", followersCount: 2 }, { username: "bob", followersCount: 1 }]
+// Steps: Use `map` to create an object with the username and the count of followers.
+
+const countFollowers = function (users) {
+  return users.map(({ username, followers }) => {
+    const obj = { username };
+    obj.followersCount = followers.length;
+
+    return obj;
+  });
+};
+
+//---------------------------------------------------------------------------//
+// given an array of posts, each with a list of comments, return a new array of the comments with a "replied to" note added if the post index is even
+// [{ post: "Vacation", comments: ["Nice!", "Love it!"] }, { post: "Dinner", comments: ["Yummy", "Looks great!"] }]
+// => [["Nice! replied to", "Love it! replied to"], ["Yummy", "Looks great!"]]
+// Steps: Use `map` and the index to conditionally append "replied to" for even indexed posts.
+
+const addReplyNoteToComments = function (posts) {
+  return posts.map(({ comments }, index) => {
+    if (index % 2 === 0) {
+      return comments.map((each) => each.concat(" replied to"));
+    }
+
+    return comments;
+  });
+};
+
+//---------------------------------------------------------------------------//
+// given an array of videos, each with a list of comments, return a new array where each comment is capitalized if the number of likes on the video is more than 1000
+// [{ video: "Dance", likes: 1200, comments: ["great video", "love this"] }, { video: "Food", likes: 800, comments: ["looks good", "yum"] }]
+// => [["Great video", "Love this"], ["looks good", "yum"]]
+// Steps: Use `map` to capitalize comments only if the number of likes exceeds 1000.
+
+const capitalizeCommentsIfPopular = function (videos) {
+  return videos.map(({ likes, comments }) => {
+    if (likes < 1000) {
+      return comments;
+    }
+
+    return comments.map(
+      (comment) => comment.at(0).toUpperCase() + comment.slice(1)
+    );
+  });
+};
+
+//---------------------------------------------------------------------------//
+// => [{ tag: "fun", count: 2 }, { tag: "dance", count: 1 }, { tag: "recipe", count: 1 }, { tag: "yum", count: 1 }]
+// given an array of posts, each with a list of user tags, return a new array where each tag is transformed into an object with { tag: 'username', count: x },
+// where x is the number of times the tag appears in the post's list of tags, in
+// [{ post: "TikTok Challenge", tags: ["fun", "dance", "fun"] },
+// { post: "Viral Recipe", tags: ["recipe", "yum", "fun"] }]
+// Steps: Use `map` to return objects with the tag and count, aggregating the counts based on the tags in each post.
+
+const tagCount = function (posts) {};
+
+//---------------------------------------------------------------------------//
+// given two arrays, one of numbers and one of multipliers, create closures to multiply the base by the multiplier, then use flatMap to multiply each number in the base array by each multiplier
+// [1, 2], [1, 2, 3] => [1, 2, 3, 2, 4, 6]
+
+const multiplyWithMultipliers = (multipliers) => {
+  return (base) => {
+    return multipliers.map((ele) => ele * base);
+  };
+};
+
+const multiply = function (bases, multipliers) {
+  return bases.flatMap(multiplyWithMultipliers(multipliers));
+};
+
+//---------------------------------------------------------------------------//
+// given two arrays, one of numbers and one of addends, create closures to add the base number to the addend, then use flatMap to apply each addend to each number
+// [1, 2], [5, 10] => [6, 11, 7, 12]
+
+const addAugend = (addends) => {
+  return (augend) => {
+    return addends.map((ele) => ele + augend);
+  };
+};
+
+const add = function (bases, addends) {
+  return bases.flatMap(addAugend(addends));
+};
+
+//---------------------------------------------------------------------------//
+// given two arrays, one of numbers and one of divisors, create closures to divide the base number by the divisor, then use flatMap to divide each number by each divisor
+// [10, 20], [2, 5] => [5, 2, 10, 4]
+
+const divideWithDivisors = (divisors) => {
+  return (dividend) => {
+    return divisors.map((number) => dividend / number);
+  };
+};
+
+const divide = function (bases, divisors) {
+  return bases.flatMap(divideWithDivisors(divisors));
+};
+
+//---------------------------------------------------------------------------//
+// given two arrays, one of numbers and one of exponents, create closures to raise the base number to the exponent, then use flatMap to raise each number by each exponent
+// [2, 3], [2, 3] => [4, 8, 9, 27]
+const exponentiate = (powers) => {
+  return (number) => {
+    return powers.map((power) => number ** power);
+  };
+};
+
+const power = function (bases, exponents) {
+  return bases.flatMap(exponentiate(exponents));
+};
+
+//---------------------------------------------------------------------------//
+// given two arrays, one of prices and one of discounts, create closures to apply the discount to the price, then use flatMap to apply each discount to each price
+// [100, 200], [0.1, 0.2] => [90, 80, 180, 160]
+
+const calculateDiscounts = (discounts) => {
+  return (price) => {
+    return discounts.map((discountPercent) => price - price * discountPercent);
+  };
+};
+
+const applyDiscount = function (prices, discounts) {
+  return prices.flatMap(calculateDiscounts(discounts));
+};
+
+//---------------------------------------------------------------------------//
+// given two arrays, one of names and one of titles, create closures that combine each name with each title, then use flatMap to generate all combinations of names and titles
+// ["Alice", "Bob"], ["Developer", "Manager"] => ["Alice Developer", "Alice Manager", "Bob Developer", "Bob Manager"]
+
+const combineTitles = (titles) => {
+  return (name) => titles.map((role) => [name, role].join(" "));
+};
+
+const combineNameAndTitle = function (names, titles) {
+  return names.flatMap(combineTitles(titles));
+};
+
+//---------------------------------------------------------------------------//
+// given two arrays, one of numbers and one of multipliers, create closures that multiply the base number by the corresponding multiplier at the same index, then return the results
+// [1, 2, 3], [2, 3, 4] => [2, 6, 12]
+const multiplyWithCorresponding = (multipliers) => {
+  return (number, index) => number * multipliers[index];
+};
+
+const multiplyByCorresponding = function (bases, multipliers) {
+  return bases.map(multiplyWithCorresponding(multipliers));
+};
+
+//---------------------------------------------------------------------------//
+// given an array of objects, where each object contains a `name` and `age`, create a closure for each person that adds a `yearsToRetirement` property, then use flatMap to calculate the retirement year for each person assuming retirement at 65
+// [{name: "Alice", age: 30}, {name: "Bob", age: 40}] => ["Alice will retire in 35 years", "Bob will retire in 25 years"]
+
+const calculateYearsToRetirement = (retirementAge) => {
+  return (age) => retirementAge - age;
+};
+
+const calculateRetirement = (people) => {
+  const yearsToRetirement = calculateYearsToRetirement(65);
+
+  return people.flatMap(
+    ({ name, age }) =>
+      name + " will retire in " + yearsToRetirement(age) + " years"
+  );
+};
+
+//---------------------------------------------------------------------------//
+// given an array of numbers, create a closure that checks if a number is greater than or equal to a specified value (e.g., 10), then use flatMap to return only the numbers that meet the condition
+// [5, 10, 15], 10 => [10, 15]
+
+const checkIfGreaterOrEqual = (threshold) => {
+  return (number) => number >= threshold;
+};
+
+const filterGreaterThanEqual = function (numbers, threshold) {
+  const condition = checkIfGreaterOrEqual(threshold);
+  const mappedNumbers = numbers.map((number) =>
+    condition(number) ? [number] : []
+  );
+
+  return mappedNumbers.flatMap((number) => number);
+};
+
+//---------------------------------------------------------------------------//
+// given an array of strings representing messages and an array of punctuation marks, create closures that append each punctuation mark to each message, then use flatMap to create all possible combinations of messages with punctuation
+// ["Hello", "Goodbye"], ["!", "?"] => ["Hello!", "Hello?", "Goodbye!", "Goodbye?"]
+
+const createAppender = (strings) => {
+  return (punctuationMark) =>
+    strings.map((message) => message + punctuationMark);
+};
+
+const addPunctuation = function (messages, punctuations) {
+  const append = createAppender(messages);
+
+  return punctuations.flatMap((punctuation) => append(punctuation));
+};
+
+//---------------------------------------------------------------------------//
+// given an array of user objects with `name` and `age`, create closures that return a greeting with the user's name, then use flatMap to apply the closure to each user
+// [{name: "Alice", age: 30}, {name: "Bob", age: 25}] => ["Hello Alice!", "Hello Bob!"]
+const SPACE = " ";
+
+const createGreetings = () => {
+  const greetings = ["Hello", "Hii", "Hey buddy", "Yo bro", "Hi dude"];
+
+  return (name) => {
+    const index = Math.random() * 5;
+    return greetings[index] + SPACE + name;
+  };
+};
+
+const greetUsers = function (users) {
+  const greet = createGreetings();
+
+  return users.flatMap(({ name }) => greet(name));
+};
+
+//---------------------------------------------------------------------------//
+// given two arrays, one of people’s names and one of ages, create closures to generate a message indicating whether each person is an adult (18 or older), then use flatMap to apply the closure to each person
+// ["Alice", "Bob"], [20, 17] => ["Alice is an adult", "Bob is not an adult"]
+
+const checkStatus = (ages) => {
+  const areAdults = ages.map((age) => age >= 18);
+  return (name, index) =>
+    name + (areAdults[index] ? " is an adult" : " is not an adult");
+};
+
+const checkAdultStatus = function (names, ages) {
+  const generateMessage = checkStatus(ages);
+
+  return names.map((name, index) => generateMessage(name, index));
+};
+
+//---------------------------------------------------------------------------//
+// given an array of product objects, each containing `name` and `price`, create closures to apply a sales tax (e.g., 10%) to the price, then use flatMap to calculate the price with tax for each product
+// [{name: "Shirt", price: 20}, {name: "Shoes", price: 50}] => [22, 55]
+
+const calculateTax = (taxPercentage) => {
+  return (price) => (price * taxPercentage) / 100;
+};
+
+const applySalesTax = function (products) {
+  const taxCalculator = calculateTax(10);
+
+  return products.map(({ price }) => taxCalculator(price) + price);
+};
+
+//---------------------------------------------------------------------------//
+// given an array of user objects with `name` and `posts`, return an array of objects where each object contains the user's name and an array of post titles
+// [
+// {name: "Alice", posts: [{title: "Post 1"}, {title: "Post 2"}]},
+// {name: "Bob", posts: [{title: "Post 3"}]}
+//]
+// => [
+// {name: "Alice", posts: ["Post 1", "Post 2"]},
+// {name: "Bob", posts: ["Post 3"]}
+//]
+
+const getUserPostTitles = function (users) {
+  return users.map(({ name, posts }) => {
+    return {
+      name: name,
+      posts: posts.map(({ title }) => title),
+    };
+  });
+};
+
+//---------------------------------------------------------------------------//
+// given an array of products, where each product contains a `name`, `price`, and `tags` array, return a new array of products where each product contains its name and an array of uppercased tags
+// [
+// {name: "Shirt", price: 20, tags: ["cotton", "summer"]},
+// {name: "Shoes", price: 50, tags: ["leather", "winter"]}
+// ]
+// => [
+// {name: "Shirt", tags: ["COTTON", "SUMMER"]},
+//  {name: "Shoes", tags: ["LEATHER", "WINTER"]}
+// ]
+
+const formatProductTags = (products) => {
+  return products.map(({ name, tags }) => {
+    return { name, tags: tags.map((tag) => tag.toUpperCase()) };
+  });
+};
+
+//---------------------------------------------------------------------------//
+// given an array of categories where each category has a `categoryName` and `items` array, return a new array where each item is an object with the category name and an array of item names
+// [
+// {categoryName: "Fruits", items: [{name: "Apple"}, {name: "Banana"}]}, {categoryName: "Vegetables", items: [{name: "Carrot"}]}
+// ]
+// => [
+// {categoryName: "Fruits", items: ["Apple", "Banana"]},
+// {categoryName: "Vegetables", items: ["Carrot"]}
+// ]
+
+const getCategoryItems = function (categories) {
+  return categories.map(({ categoryName, items }) => {
+    return {
+      categoryName,
+      items: items.map(({ name }) => name),
+    };
+  });
+};
+//---------------------------------------------------------------------------//
+// given an array of order objects with `orderId` and `products`, where each product has a `name` and `quantity`, return an array of orders, where each order contains its `orderId` and an array of product names, each with the quantity
+// [
+// {
+// orderId: 1,
+// products: [{name: "Laptop", quantity: 1}, {name: "Mouse", quantity: 2}]
+// },
+// {
+// orderId: 2, products: [{name: "Keyboard", quantity: 1}]
+// }
+// ]
+// => [
+// {orderId: 1, products: ["Laptop x1", "Mouse x2"]},
+// {orderId: 2, products: ["Keyboard x1"]}
+// ]
+
+const summarizeOrderProducts = function (orders) {
+  return orders.map(({ orderId, products }) => {
+    return {
+      orderId,
+      products: products.map(({ name, quantity }) => name + " x" + quantity),
+    };
+  });
+};
+
+//---------------------------------------------------------------------------//
+// given an array of students, each with a `name` and a `courses` array, return a new array of objects, where each object contains the student's name and an array of their course names in uppercase
+// [
+// {name: "Alice", courses: [{courseName: "Math"}, {courseName: "Science"}]}, {name: "Bob", courses: [{courseName: "English"}]}]
+// => [
+// {name: "Alice", courses: ["MATH", "SCIENCE"]},
+// {name: "Bob", courses: ["ENGLISH"]}]
+
+const getStudentCourses = function (students) {
+  return students.map(({ name, courses }) => {
+    return {
+      name,
+      courses: courses.map(({ courseName }) => courseName.toUpperCase()),
+    };
+  });
+};
+
+//---------------------------------------------------------------------------//
+// given an array of books, each with a `title` and `chapters`, where each chapter has a `title` and a `pageCount`, return an array of books, each containing the book's title and an array of chapter titles along with their page counts
+// [
+// {
+// title: "Book 1",
+// chapters: [{title: "Chapter 1", pageCount: 10},
+//           {title: "Chapter 2", pageCount: 20}]
+// },
+// {
+// title: "Book 2",
+// chapters: [{title: "Chapter 1", pageCount: 15}]
+// }
+// ]
+// => [
+// {title: "Book 1", chapters: ["Chapter 1: 10 pages", "Chapter 2: 20 pages"]}, {title: "Book 2", chapters: ["Chapter 1: 15 pages"]}
+// ]
+
+const summarizeBookChapters = function (books) {
+  return books.map(({ title, chapters }) => {
+    return {
+      title,
+      chapters: chapters.map(
+        ({ title, pageCount }) => title + ": " + pageCount + " pages"
+      ),
+    };
+  });
+};
+
+//---------------------------------------------------------------------------//
+// given an array of events, where each event has a `name` and an array of `attendees`, where each attendee has a `firstName` and `lastName`, return an array of events where each event contains the event name and an array of full names of attendees
+// [
+// {
+// name: "Concert",
+// attendees: [{firstName: "John", lastName: "Doe"},
+//             {firstName: "Jane", lastName: "Smith"}]
+// },
+// {
+// name: "Conference",
+// attendees: [{firstName: "Bob", lastName: "Brown"}]
+// }
+// ]
+// => [
+// {name: "Concert", attendees: ["John Doe", "Jane Smith"]},
+// {name: "Conference", attendees: ["Bob Brown"]}
+// ]
+
+const getEventAttendees = function (events) {
+  return events.map(({ name, attendees }) => {
+    return {
+      name,
+      attendees: attendees.map(({ firstName, lastName }) =>
+        [firstName, lastName].join(SPACE)
+      ),
+    };
+  });
+};
+
 //---------------------------------Testing-----------------------------------//
 
 const isEmpty = function (array) {
@@ -885,7 +1536,7 @@ const testAll = function (testCasesArray) {
     [withoutVowelsOf, ["apple", "kiwi"], ["ppl", "kw"]],
   ];
 
-  const testCases17 = [[cumulativeSumsOf, [1, 2, 3], [1, 3, 6]]];
+  const testCases17 = [[cumulativeSumsOf, [[1, 2, 3]], [[1, 3, 6]]]];
 
   const testCases18 = [
     [reversedWordsOf, ["hello world"], ["olleh dlrow"]],
@@ -1172,68 +1823,67 @@ const testAll = function (testCasesArray) {
   ];
 
   const testCases51 = [[markLargestNumber, [1, 5, 2], [false, true, false]]];
+
+  const testCases52 = [
+    [
+      groupByGrade,
+      [
+        { name: "Alice", grade: 85 },
+        { name: "Bob", grade: 92 },
+      ],
+      [
+        ["Alice", "B"],
+        ["Bob", "A"],
+      ],
+    ],
+  ];
+
+  const testCases53 = [
+    [
+      sortByLengthAndAlphabet,
+      ["sam", "cat", "mango", "banana", "apple", "kiwi"],
+      ["cat", "sam", "kiwi", "apple", "mango", "banana"],
+    ],
+  ];
+
+  const testCases54 = [
+    [percentageOfTotalSorted, [100, 200, 50, 25], [50, 25, 12.5, 12.5]],
+  ];
+
+  const testCases55 = [
+    [
+      sortStudentsByAverage,
+      [
+        { name: "Alice", grades: [80, 90, 85] },
+        { name: "Bob", grades: [70, 75, 80] },
+      ],
+      [
+        { name: "Alice", avg: 85 },
+        { name: "Bob", avg: 75 },
+      ],
+    ],
+  ];
+
+  const testCases56 = [
+    [
+      mapToBinaryAndGroup,
+      [1, 2, 3, 4, 5],
+      [["1"], ["10"], ["11"], ["100"], ["101"]],
+    ],
+  ];
+
+  const testCases57 = [
+    [
+      flattenAndFilterEven,
+      [
+        [1, 2, 3],
+        [4, 5],
+        [6, 7, 8],
+      ],
+      [2, 4, 6, 8],
+    ],
+  ];
 }
-
-const testCases52 = [
-  [
-    groupByGrade,
-    [
-      { name: "Alice", grade: 85 },
-      { name: "Bob", grade: 92 },
-    ],
-    [
-      ["Alice", "B"],
-      ["Bob", "A"],
-    ],
-  ],
-];
-
-const testCases53 = [
-  [
-    sortByLengthAndAlphabet,
-    ["sam", "cat", "mango", "banana", "apple", "kiwi"],
-    ["cat", "sam", "kiwi", "apple", "mango", "banana"],
-  ],
-];
-
-const testCases54 = [
-  [percentageOfTotalSorted, [100, 200, 50, 25], [50, 25, 12.5, 12.5]],
-];
-
-const testCases55 = [
-  [
-    sortStudentsByAverage,
-    [
-      { name: "Alice", grades: [80, 90, 85] },
-      { name: "Bob", grades: [70, 75, 80] },
-    ],
-    [
-      { name: "Alice", avg: 85 },
-      { name: "Bob", avg: 75 },
-    ],
-  ],
-];
-
-const testCases56 = [
-  [
-    mapToBinaryAndGroup,
-    [1, 2, 3, 4, 5],
-    [["1"], ["10"], ["11"], ["100"], ["101"]],
-  ],
-];
-
-const testCases57 = [
-  [
-    flattenAndFilterEven,
-    [
-      [1, 2, 3],
-      [4, 5],
-      [6, 7, 8],
-    ],
-    [2, 4, 6, 8],
-  ],
-];
-
 const testCases58 = [
   [
     filterAdultsAndSort,
@@ -1246,7 +1896,7 @@ const testCases58 = [
   ],
 ];
 
-testAll(testCases58);
+// testAll(testCases58);
 // testAll(testCases57);
 // testAll(testCases56);
 // testAll(testCases55);
